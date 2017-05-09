@@ -38,8 +38,9 @@ public class Cliente
         ps.close();
     }
     public static void main(String[] args) {
-        Autenticacion datos = new Autenticacion();
-        try {
+        //Autenticacion datos = new Autenticacion();
+        try 
+        {
             new Autenticacion().setVisible(true);
         } catch (Exception e) {}
     }

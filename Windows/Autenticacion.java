@@ -3,10 +3,16 @@ package Windows;
 
 import java.awt.event.ActionEvent;
 import Principal.Cliente;
+import Principal.Conectar;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -146,173 +152,43 @@ public class Autenticacion extends javax.swing.JFrame
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
-    public static boolean revisarUsuario(String arch , String nomBus){
-        String texto=" ";
-        String line;
-        boolean aux=false;
-        try
-        {
-             BufferedReader br = null;
-            br = new BufferedReader(new FileReader(arch));
-            while ((line = br.readLine()) != null) 
-            {
-		        System.out.println(line);
-                StringTokenizer stringTokenizer = new StringTokenizer(line, ",");
-                while (stringTokenizer.hasMoreElements()) 
-                {   
-		    String username = stringTokenizer.nextElement().toString();
-                    if (nomBus.equals(username))
-                    {
-                        aux= true;
-                    }       
-		}
-            }
-        }
-        catch(Exception e)
-        {
-            System.out.println("Error al leer");
-        }
-        return aux;
-    }
-    
-    public static boolean RevisarContrasena(String arch, String nomBus, String password )
-    {
-        String pass;
-        String line;
-        boolean aux=false;
         
-        try
+    private void btnConectarseActionPerformed(java.awt.event.ActionEvent evt) 
+    {//GEN-FIRST:event_btnConectarseActionPerformed
+        try 
         {
-             BufferedReader br = null;
-   
-            br = new BufferedReader(new FileReader(arch));
-            
-            while ((line = br.readLine()) != null) 
+            String ip = CDIP.getText();
+            this.IP = ip;
+            this.port = Integer.parseInt(CP.getText());
+            Cliente c = new Cliente();
+            c.setHost(ip);
+            c.setPort(port);
+            Connection con = Conectar.getConnection();
+            String myDriver = "com.mysql.jdbc.Driver";
+            String myUrl = "jdbc:mysql://localhost/users";
+            Class.forName(myDriver);
+            //Conectar conect = (Conectar) DriverManager.getConnection(myUrl, "root", "");
+            String sqlQuery = "SELECT nom_user AND pwd FROM users";
+            Statement st = con.createStatement();
+            boolean resultado = st.execute(sqlQuery);
+            if(resultado == true)
             {
-		        System.out.println(line);
-
-                StringTokenizer stringTokenizer = new StringTokenizer(line, ",");
-
-                while (stringTokenizer.hasMoreElements()) 
-                {   
-		    String username = stringTokenizer.nextElement().toString();
-                    if (nomBus.equals(username))
-                    {
-                        pass = stringTokenizer.nextElement().toString();
-                        if(pass.equals(password)){
-                            aux=true;
-                        }
-                    }        
-		}
-            }
-        }
-        catch(Exception e)
-        {
-            System.out.println("Error al leer");
-        }
-        return aux;
-    }
-    
- 
-    boolean revisarBandera(String arch, String nomBus){
-        String line;
-        String pass;
-        boolean aux=true;
-        
-        try
-        {
-             BufferedReader br = null;
-   
-            br = new BufferedReader(new FileReader(arch));
-            
-            while ((line = br.readLine()) != null) 
+                this.dispose();
+                c.conectar();
+                JOptionPane.showMessageDialog(null,"¡¡¡Conexion exitosa!!!",null ,JOptionPane.WARNING_MESSAGE);
+                new Perfil().setVisible(true);
+                c.cerrar();
+            }else
             {
-		        System.out.println(line);
-
-                StringTokenizer stringTokenizer = new StringTokenizer(line, ",");
-
-                while (stringTokenizer.hasMoreElements()) 
-                {   
-		    String username = stringTokenizer.nextElement().toString();
-                    if (nomBus.equals(username))
-                    {
-                        pass = stringTokenizer.nextElement().toString();
-                        pass = stringTokenizer.nextElement().toString();
-                        
-                        if(pass.equals("1")){
-                            JOptionPane.showMessageDialog(null,"usuariio bloqueado",null,JOptionPane.ERROR_MESSAGE);
-                            aux=false;
-                        }
-                    }        
-		}
+                this.dispose();
+                new Autenticacion().setVisible(true);
             }
-        }
-        catch(Exception e)
+        } catch (IOException ex) 
         {
-            System.out.println("Error al leer");
-        }
-        return aux;
-    }
-    
-    boolean camposLlenos(String un, char[] pwd){
-        char[] none = {};
-        if((un.equals(""))||(Arrays.equals(pwd, none)))
-            {
-                JOptionPane.showMessageDialog(null,"Necesitas ingresar un usuario y contraseÃ±a",null,JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-       return true;
-    }
-    
-    boolean datosCorrectos(String un, char[] pwd){
-        int lotxtPW=0;
-        String aux = ""; 
-        lotxtPW = pwd.length; 
-        boolean res=true;
-        for(int i=0;i<lotxtPW;i++){
-            aux = aux + pwd[i];
-        }
-        String sArch = "C:\\Users\\doubl\\OneDrive\\Documents\\NetBeansProjects\\PP\\Usuarios\\users.txt";
-        res = Autenticacion.RevisarContrasena(sArch, un , aux );
-                //JOptionPane.showMessageDialog(null,res);
-        if(res != true)
-        {
-            JOptionPane.showMessageDialog(null,"Â¡Â¡Â¡La contraseña o usuario no corresponden!!!",null ,JOptionPane.WARNING_MESSAGE);
-            res=false;
-        }      
-        return res;
-    }
-    
-    private void btnConectarseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarseActionPerformed
-    BufferedReader tec = new BufferedReader(new InputStreamReader(System.in));
-        char[] pwd;
-        char[] none = {};
-        boolean res;
-        String username ;
-        try {
-                    String ip = CDIP.getText();
-                    this.IP = ip;
-                    this.port = Integer.parseInt(CP.getText());
-                     Cliente c = new Cliente();
-                     c.setHost(ip);
-                     c.setPort(port);
-                     username = CU.getText();
-                     pwd = CC.getPassword();
-                    if((((camposLlenos(username,pwd)==true)&&(datosCorrectos(username,pwd)))&&(revisarBandera("C:\\Users\\doubl\\OneDrive\\Documents\\NetBeansProjects\\PP\\Usuarios\\users.txt",username)) == true)){
-                        this.dispose();
-                        c.conectar();
-                        JOptionPane.showMessageDialog(null,"Â¡Â¡Â¡conexion exitosa!!!",null ,JOptionPane.WARNING_MESSAGE);
-                        new Perfil().setVisible(true);
-                        c.cerrar();
-                    }else{
-                        this.dispose();
-                        new Autenticacion().setVisible(true);
-                    }
-        } catch (IOException ex) {
            Logger.getLogger(Autenticacion.class.getName()).log(Level.SEVERE, null, ex);
         }
+        catch (SQLException | ClassNotFoundException sqlex){}
     this.dispose();
-    
     }//GEN-LAST:event_btnConectarseActionPerformed
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
@@ -322,7 +198,8 @@ public class Autenticacion extends javax.swing.JFrame
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) 
+    {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -348,7 +225,8 @@ public class Autenticacion extends javax.swing.JFrame
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        java.awt.EventQueue.invokeLater(new Runnable() 
+        {
             public void run() {
                 new Autenticacion().setVisible(true);
             }

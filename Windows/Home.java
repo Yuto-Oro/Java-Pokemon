@@ -8,6 +8,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.Statement;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.Icon;
@@ -92,8 +94,8 @@ public class Home extends javax.swing.JFrame
 
     private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInActionPerformed
         //CREAR CUENTA CON BASE DE DATOS
+        new Register().setVisible(true);
         this.dispose();
-        Conectar c = new Conectar();
     }//GEN-LAST:event_btnSignInActionPerformed
 
     private void btnLocalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLocalActionPerformed
